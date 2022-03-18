@@ -45,7 +45,7 @@ class SimpleKey extends AbstractClient
 			$this->setAccessKey($accessKey);
 		}
 	}
-	
+
 	/**
 	 * Устанавливает ключ API.
 	 *
@@ -75,7 +75,7 @@ class SimpleKey extends AbstractClient
 	{
 		return (string) $this->accessKey;
 	}
-	
+
 	/**
 	 * Провести аунтификацию в соостветствии с типом сервиса
 	 *
@@ -83,7 +83,7 @@ class SimpleKey extends AbstractClient
 	 *
 	 * @return RequestInterface
 	 */
-	protected function authentication(RequestInterface $request)
+	protected function authentication(RequestInterface $request): RequestInterface
 	{
 		$uri = $request->getUri();
 		$key = http_build_query(['key' => $this->getAccessKey()], null, '&');

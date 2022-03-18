@@ -43,7 +43,7 @@ trait FilterTrait
 	 *
 	 * @return   $this
 	 */
-	public function setLimit($limit, $offset = null):FilterTrait
+	public function setLimit($limit, $offset = null)
 	{
 		if (filter_var($limit, FILTER_VALIDATE_INT) === false)
 		{
@@ -68,7 +68,7 @@ trait FilterTrait
 	 *
 	 * @return    $this
 	 */
-	public function setOffset($offset):FilterTrait
+	public function setOffset($offset)
 	{
 		if (filter_var($offset, FILTER_VALIDATE_INT) === false)
 		{
@@ -90,7 +90,7 @@ trait FilterTrait
 	 * @return    $this
 	 * @throws    \UnexpectedValueException
 	 */
-	public function setSort($sort, $inverse = false):FilterTrait
+	public function setSort($sort, $inverse = false)
 	{
 		$sort = (string) $sort;
 
