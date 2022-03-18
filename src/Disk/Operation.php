@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Disk
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -59,14 +59,10 @@ class Operation
 	/**
 	 * Конструктор.
 	 *
-	 * @param string    $identifier   идентификатор операции.
+	 * @param string $identifier   идентификатор операции.
 	 */
-	public function __construct($identifier, Disk $disk, UriInterface $uri)
+	public function __construct(string $identifier, Disk $disk, UriInterface $uri)
 	{
-		if (!is_string($identifier)) {
-			throw new \InvalidArgumentException('Ожидается строковый идентификатор асинхронной операции.');
-		}
-
 		$this->uri = $uri;
 		$this->parent = $disk;
 		$this->identifier = $identifier;
@@ -74,16 +70,17 @@ class Operation
 
 	/**
 	 * Текстовый статус операции.
-	 * 
+	 *
 	 * @return  string|null NULL если не удалось получить статус.
+	 * @throws \JsonException
 	 */
-	public function getStatus()
+	public function getStatus():?string
 	{
 		$response = $this->parent->send(new Request($this->uri->withPath($this->uri->getPath() . 'operations/'
 			. $this->getIdentifier()), 'GET'));
 
-		if ($response->getStatusCode() == 200) {
-			$response = json_decode($response->getBody(), true);
+		if ($response->getStatusCode() === 200) {
+			$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 			if (isset($response['status'])) {
 				return $response['status'];
@@ -98,7 +95,7 @@ class Operation
 	 *
 	 * @return string
 	 */
-	public function getIdentifier()
+	public function getIdentifier():string
 	{
 		return $this->identifier;
 	}
@@ -107,8 +104,9 @@ class Operation
 	 * Проверяет успешна ли операция.
 	 *
 	 * @return bool
+	 * @throws \JsonException
 	 */
-	public function isSuccess()
+	public function isSuccess():bool
 	{
 		return $this->getStatus() == self::SUCCESS;
 	}
@@ -117,19 +115,21 @@ class Operation
 	 * Если операция завершилась неудачей.
 	 *
 	 * @return  bool
+	 * @throws \JsonException
 	 */
-	public function isFailure()
+	public function isFailure():bool
 	{
-		return $this->getStatus() != 'success';
+		return $this->getStatus() !== 'success';
 	}
 
 	/**
 	 * Операция в процессе выполнения.
 	 *
 	 * @return bool
+	 * @throws \JsonException
 	 */
-	public function isPending()
+	public function isPending():bool
 	{
-		return $this->getStatus() == self::PENDING;
+		return $this->getStatus() === self::PENDING;
 	}
 }

@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Disk
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -122,34 +122,11 @@ trait MediaTypeTrait
 	];
 
 	/**
-	 * Тип файлов, которые нужно включить в список
-	 *
-	 * @param    string $media_type
-	 *
-	 * @return    $this
-	 * @throws    \UnexpectedValueException
-	 */
-	public function setMediaType($media_type)
-	{
-		$media_type = (string) $media_type;
-
-		if ( ! in_array($media_type, $this->getMediaTypes()))
-		{
-			throw new \UnexpectedValueException('Тип файла, значения - "'.implode('", "', $this->getMediaTypes()).'".');
-		}
-
-		$this->isModified = true;
-		$this->parameters['media_type'] = $media_type;
-
-		return $this;
-	}
-
-	/**
 	 * Получает установленное значение.
 	 *
 	 * @return  string
 	 */
-	public function getMediaType()
+	public function getMediaType():?string
 	{
 		if (isset($this->parameters['media_type']))
 		{
@@ -164,7 +141,7 @@ trait MediaTypeTrait
 	 *
 	 * @return array
 	 */
-	public function getMediaTypes()
+	public function getMediaTypes():array
 	{
 		return $this->mediaTypes;
 	}

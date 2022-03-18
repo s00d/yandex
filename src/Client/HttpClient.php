@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Client
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -258,7 +258,7 @@ class HttpClient implements HttpClientInterface, HttpAsyncClientInterface
 
 		if ( ! $request->hasHeader('Expect') && in_array($request->getMethod(), ['POST', 'PUT']))
 		{
-			if ($request->getProtocolVersion() < 2.0 && ! $body->isSeekable() || $size === null || $size > 1048576)
+			if (($request->getProtocolVersion() < 2.0 && !$body->isSeekable()) || $size === null || $size > 1048576)
 			{
 				$headers[] = 'Expect: 100-Continue';
 			}

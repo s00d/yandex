@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -154,6 +154,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 * @param array $allowed
 	 *
 	 * @return array
+	 * @throws \JsonException
 	 * @example
 	 *
 	 * array (size=5)
@@ -171,7 +172,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 			$response = $this->send(new Request($this->uri, 'GET'));
 
 			if ($response->getStatusCode() == 200) {
-				$response = json_decode($response->getBody(), true);
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (!is_array($response)) {
 					throw new UnsupportedException('Получен не поддерживаемый формат ответа от API Диска.');
@@ -252,7 +253,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 				->withQuery(http_build_query($parameters, null, '&')), 'GET')));
 
 			if ($response->getStatusCode() == 200) {
-				$response = json_decode($response->getBody(), true);
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (isset($response['items'])) {
 					return array_map(function ($item) {
@@ -317,7 +318,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 			$this->setAccessTokenRequired($previous);
 
 			if ($response->getStatusCode() == 200) {
-				$response = json_decode($response->getBody(), true);
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (isset($response['items'])) {
 					return array_map(function ($item) {
@@ -380,7 +381,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 				->withQuery(http_build_query($parameters + ['path' => 'trash:/'], null, '&')), 'GET')));
 
 			if ($response->getStatusCode() == 200) {
-				$response = json_decode($response->getBody(), true);
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (isset($response['_embedded']['items'])) {
 					return array_map(function ($item) {
@@ -405,7 +406,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 		$response = $this->send(new Request($this->uri->withPath($this->uri->getPath() . 'trash/resources'), 'DELETE'));
 
 		if ($response->getStatusCode() == 204) {
-			$response = json_decode($response->getBody(), true);
+			$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 			if (!empty($response['operation'])) {
 				return $response['operation'];
@@ -436,7 +437,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 				->withQuery(http_build_query($parameters, null, '&')), 'GET')));
 
 			if ($response->getStatusCode() == 200) {
-				$response = json_decode($response->getBody(), true);
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (isset($response['items'])) {
 					return array_map(function ($item) {
@@ -507,7 +508,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 		$response = parent::send($request);
 
 		if ($response->getStatusCode() == 202) {
-			if (($responseBody = json_decode($response->getBody(), true)) && isset($responseBody['href'])) {
+			if (($responseBody = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR)) && isset($responseBody['href'])) {
 				$operation = new Uri($responseBody['href']);
 
 				if (!$operation->getQuery()) {

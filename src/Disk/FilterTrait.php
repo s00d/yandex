@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Disk
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -43,7 +43,7 @@ trait FilterTrait
 	 *
 	 * @return   $this
 	 */
-	public function setLimit($limit, $offset = null)
+	public function setLimit($limit, $offset = null):FilterTrait
 	{
 		if (filter_var($limit, FILTER_VALIDATE_INT) === false)
 		{
@@ -68,7 +68,7 @@ trait FilterTrait
 	 *
 	 * @return    $this
 	 */
-	public function setOffset($offset)
+	public function setOffset($offset):FilterTrait
 	{
 		if (filter_var($offset, FILTER_VALIDATE_INT) === false)
 		{
@@ -80,7 +80,7 @@ trait FilterTrait
 
 		return $this;
 	}
-	
+
 	/**
 	 * Атрибут, по которому сортируется список ресурсов, вложенных в папку.
 	 *
@@ -90,7 +90,7 @@ trait FilterTrait
 	 * @return    $this
 	 * @throws    \UnexpectedValueException
 	 */
-	public function setSort($sort, $inverse = false)
+	public function setSort($sort, $inverse = false):FilterTrait
 	{
 		$sort = (string) $sort;
 
@@ -115,7 +115,7 @@ trait FilterTrait
 	 *
 	 * @return array
 	 */
-	public function getParameters(array $allowed = null)
+	public function getParameters(array $allowed = null):array
 	{
 		if ($allowed !== null)
 		{
@@ -130,7 +130,7 @@ trait FilterTrait
 	 *
 	 *	@return  bool
 	 */
-	protected function isModified()
+	protected function isModified():bool
 	{
 		return (bool) $this->isModified;
 	}

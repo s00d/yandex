@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Client\Exception
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -24,9 +24,9 @@ class UnauthorizedException extends \RuntimeException implements Exception
 	 *
 	 * @access  public
 	 *
-	 * @param   int        $code     Код исключения
-	 * @param   string     $message  Сообщение исключения
-	 * @param   \Exception $previous Предыдущее исключение
+	 * @param string $message Сообщение исключения
+	 * @param int $code Код исключения
+	 * @param \Exception|null $previous Предыдущее исключение
 	 */
 	public function __construct($message, $code = 401, \Exception $previous = null)
 	{

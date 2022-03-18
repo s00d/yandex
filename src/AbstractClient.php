@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -107,14 +107,14 @@ abstract class AbstractClient
 	 *
 	 * @return \Psr\Http\Message\RequestInterface
 	 */
-	abstract protected function authentication(RequestInterface $request);
+	abstract protected function authentication(RequestInterface $request):RequestInterface;
 
 	/**
 	 * Формат обмена данными
 	 *
 	 * @return    string
 	 */
-	public function getContentType()
+	public function getContentType():string
 	{
 		return $this->contentType;
 	}
@@ -126,7 +126,7 @@ abstract class AbstractClient
 	 *
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
-	public function send(RequestInterface $request)
+	public function send(RequestInterface $request):ResponseInterface
 	{
 		$request = $this->authentication($request);
 		$defaultHeaders = [
@@ -170,7 +170,7 @@ abstract class AbstractClient
 	 * @return \Psr\Http\Message\ResponseInterface если статус код не является ошибочным, то вернуть объект ответа
 	 * @throws \Arhitector\Yandex\Client\Exception\ServiceException
 	 */
-	protected function transformResponseToException(RequestInterface $request, ResponseInterface $response)
+	protected function transformResponseToException(RequestInterface $request, ResponseInterface $response):ResponseInterface
 	{
 		if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
 			throw new \RuntimeException($response->getReasonPhrase(), $response->getStatusCode());

@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Disk\Resource
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -71,6 +71,7 @@ class Removed extends AbstractResource
 	 * Получает информацию о ресурсе
 	 *
 	 * @return    mixed
+	 * @throws \JsonException
 	 */
 	public function toArray(array $allowed = null)
 	{
@@ -81,7 +82,7 @@ class Removed extends AbstractResource
 				]), null, '&')), 'GET')));
 
 			if ($response->getStatusCode() == 200) {
-				$response = json_decode($response->getBody(), true);
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (!empty($response)) {
 					$this->isModified = false;
@@ -107,14 +108,15 @@ class Removed extends AbstractResource
 	}
 
 	/**
-	 *	Восстановление файла или папки из Корзины
-	 *	В корзине файлы с одинаковыми именами в действительности именют постфикс к имени в виде unixtime
+	 *    Восстановление файла или папки из Корзины
+	 *    В корзине файлы с одинаковыми именами в действительности именют постфикс к имени в виде unixtime
 	 *
-	 *	@param	mixed	$name	оставляет имя как есть и если boolean это заменяет overwrite
-	 *	@param	boolean	$overwrite
-	 *	@return	mixed
+	 * @param mixed $name оставляет имя как есть и если boolean это заменяет overwrite
+	 * @param boolean $overwrite
+	 * @return    mixed
+	 * @throws \JsonException
 	 */
-	public function restore($name = null, $overwrite = false)
+	public function restore($name = null, bool $overwrite = false)
 	{
 		if (is_bool($name)) {
 			$overwrite = $name;
@@ -138,11 +140,11 @@ class Removed extends AbstractResource
 
 		$response = $this->client->send($request);
 
-		if ($response->getStatusCode() == 201 || $response->getStatusCode() == 202) {
+		if ($response->getStatusCode() === 201 || $response->getStatusCode() === 202) {
 			$this->setContents([]);
 
-			if ($response->getStatusCode() == 202) {
-				$response = json_decode($response->getBody(), true);
+			if ($response->getStatusCode() === 202) {
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (isset($response['operation'])) {
 					$response['operation'] = $this->client->getOperation($response['operation']);

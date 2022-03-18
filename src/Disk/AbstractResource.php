@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Disk
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -55,7 +55,7 @@ abstract class AbstractResource implements \ArrayAccess, \Countable, \IteratorAg
 	 *
 	 * @return bool
 	 */
-	public function has($index = null)
+	public function has($index = null):bool
 	{
 		try
 		{
@@ -82,7 +82,7 @@ abstract class AbstractResource implements \ArrayAccess, \Countable, \IteratorAg
 	 *
 	 * @return bool
 	 */
-	public function isFile()
+	public function isFile():bool
 	{
 		return $this->get('type', false) === 'file';
 	}
@@ -92,7 +92,7 @@ abstract class AbstractResource implements \ArrayAccess, \Countable, \IteratorAg
 	 *
 	 * @return bool
 	 */
-	public function isDir()
+	public function isDir():bool
 	{
 		return $this->get('type', false) === 'dir';
 	}
@@ -102,7 +102,7 @@ abstract class AbstractResource implements \ArrayAccess, \Countable, \IteratorAg
 	 *
 	 * @return boolean
 	 */
-	public function isPublish()
+	public function isPublish():bool
 	{
 		return $this->has('public_key');
 	}
@@ -112,7 +112,7 @@ abstract class AbstractResource implements \ArrayAccess, \Countable, \IteratorAg
 	 *
 	 * @return    string
 	 */
-	public function getPath()
+	public function getPath():string
 	{
 		return $this->path;
 	}

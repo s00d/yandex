@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Disk\Resource
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -90,6 +90,7 @@ class Opened extends AbstractResource
 	 * Получает информацию о ресурсе
 	 *
 	 * @return    mixed
+	 * @throws \JsonException
 	 */
 	public function toArray(array $allowed = null)
 	{
@@ -99,8 +100,8 @@ class Opened extends AbstractResource
 					'public_key' => $this->getPublicKey()
 				]), null, '&')), 'GET')));
 
-			if ($response->getStatusCode() == 200) {
-				$response = json_decode($response->getBody(), true);
+			if ($response->getStatusCode() === 200) {
+				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 				if (!empty($response)) {
 					$this->isModified = false;
@@ -134,7 +135,7 @@ class Opened extends AbstractResource
 	 *
 	 * @TODO    Не работает для файлов вложенных в публичную папку.
 	 */
-	public function getLink()
+	public function getLink():string
 	{
 		if (!$this->has()) {
 			throw new NotFoundException('Не удалось найти запрошенный ресурс.');
@@ -146,8 +147,8 @@ class Opened extends AbstractResource
 				'path'       => (string) $this->getPath()
 			], null, '&')), 'GET'));
 
-		if ($response->getStatusCode() == 200) {
-			$response = json_decode($response->getBody(), true);
+		if ($response->getStatusCode() === 200) {
+			$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 			if (isset($response['href'])) {
 				return $response['href'];
@@ -163,13 +164,14 @@ class Opened extends AbstractResource
 	 * @param resource|StreamInterface|string $destination Путь, по которому будет сохранён файл
 	 *                                                     StreamInterface будет записан в поток
 	 *                                                     resource открытый на запись
-	 * @param boolean                         $overwrite   флаг перезаписи
-	 * @param boolean                         $check_hash  провести проверку целостности скачанного файла
+	 * @param boolean $overwrite флаг перезаписи
+	 * @param boolean $check_hash провести проверку целостности скачанного файла
 	 *                                                     на основе хэша MD5
 	 *
 	 * @return bool
+	 * @throws \JsonException
 	 */
-	public function download($destination, $overwrite = false, $check_hash = false)
+	public function download($destination, bool $overwrite = false, bool $check_hash = false)
 	{
 		$destination_type = gettype($destination);
 
@@ -181,7 +183,7 @@ class Opened extends AbstractResource
 			if (!$destination->isWritable()) {
 				throw new \OutOfBoundsException('Дескриптор файла должен быть открыт с правами на запись.');
 			}
-		} else if ($destination_type == 'string') {
+		} else if ($destination_type === 'string') {
 			if (is_file($destination) && !$overwrite) {
 				throw new AlreadyExistsException('По указанному пути "' . $destination . '" уже существует ресурс.');
 			}
@@ -197,7 +199,7 @@ class Opened extends AbstractResource
 
 		$response = $this->client->send(new Request($this->getLink(), 'GET'));
 
-		if ($response->getStatusCode() == 200) {
+		if ($response->getStatusCode() === 200) {
 			$stream = $response->getBody();
 
 			if ($check_hash) {
@@ -219,9 +221,9 @@ class Opened extends AbstractResource
 			$this->emit('downloaded', $this, $destination, $this->client);
 			$this->client->emit('downloaded', $this, $destination, $this->client);
 
-			if ($destination_type == 'object') {
+			if ($destination_type === 'object') {
 				return $destination;
-			} else if ($check_hash && $destination_type == 'string' && $this->isFile()) {
+			} else if ($check_hash && $destination_type === 'string' && $this->isFile()) {
 				if (hash_final($ctx, false) !== $this->get('md5', null)) {
 					throw new \RangeException('Ресурс скачан, но контрольные суммы различаются.');
 				}
@@ -239,7 +241,7 @@ class Opened extends AbstractResource
 	 *
 	 * @return    boolean
 	 */
-	public function hasEqual()
+	public function hasEqual():bool
 	{
 		if ($this->has() && ($path = $this->get('name'))) {
 			try {
@@ -255,12 +257,13 @@ class Opened extends AbstractResource
 	/**
 	 * Сохранение публичного файла в «Загрузки» или отдельный файл из публичной папки
 	 *
-	 * @param    string $name Имя, под которым файл следует сохранить в папку «Загрузки»
-	 * @param    string $path Путь внутри публичной папки.
+	 * @param string|null $name Имя, под которым файл следует сохранить в папку «Загрузки»
+	 * @param string|null $path Путь внутри публичной папки.
 	 *
 	 * @return    mixed
+	 * @throws \JsonException
 	 */
-	public function save($name = null, $path = null)
+	public function save(string $name = null, string $path = null)
 	{
 		$parameters = [];
 
@@ -296,8 +299,8 @@ class Opened extends AbstractResource
 				'public_key' => $this->getPublicKey()
 			] + $parameters, null, '&')), 'POST')));
 
-		if ($response->getStatusCode() == 202 || $response->getStatusCode() == 201) {
-			$response = json_decode($response->getBody(), true);
+		if ($response->getStatusCode() === 202 || $response->getStatusCode() === 201) {
+			$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 			if (isset($response['operation'])) {
 				$response['operation'] = $this->client->getOperation($response['operation']);
@@ -326,7 +329,7 @@ class Opened extends AbstractResource
 	 *
 	 * @return $this
 	 */
-	public function setPath($path)
+	public function setPath($path):Opened
 	{
 		if (!is_scalar($path)) {
 			throw new \InvalidArgumentException('Параметр "path" должен быть строкового типа.');

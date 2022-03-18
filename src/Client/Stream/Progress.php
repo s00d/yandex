@@ -4,7 +4,7 @@
  * Часть библиотеки для работы с сервисами Яндекса
  *
  * @package    Arhitector\Yandex\Client\Stream
- * @version    2.0
+ * @version    2.2
  * @author     Arhitector
  * @license    MIT License
  * @copyright  2016 Arhitector
@@ -22,7 +22,7 @@ use Laminas\Diactoros\Stream;
  *
  * @package Arhitector\Yandex\Client\Stream
  */
-class Progress extends Stream implements StreamInterface
+class Progress extends Stream
 {
 	use EmitterTrait;
 
@@ -60,7 +60,7 @@ class Progress extends Stream implements StreamInterface
 	 *     if no bytes are available.
 	 * @throws \RuntimeException if an error occurs.
 	 */
-	public function read($length)
+	public function read($length) : string
 	{
 		$this->readSize += $length;
 		$percent = round(100 / $this->totalSize * $this->readSize, 2);
@@ -76,7 +76,7 @@ class Progress extends Stream implements StreamInterface
 	 * @throws \RuntimeException if unable to read or an error occurs while
 	 *     reading.
 	 */
-	public function getContents()
+	public function getContents() : string
 	{
 		$this->readSize = $this->totalSize;
 		$this->emit('progress', 100.0);
@@ -97,14 +97,11 @@ class Progress extends Stream implements StreamInterface
 	 * @return bool
 	 * @throws \RuntimeException on failure.
 	 */
-	public function seek($offset, $whence = SEEK_SET)
+	public function seek($offset, $whence = SEEK_SET) : void
 	{
-		if (parent::seek($offset, $whence)) {
+		try {
+			parent::seek($offset, $whence);
 			$this->readSize = $offset;
-
-			return true;
-		}
-
-		return false;
+		} catch (\Exception $e) {}
 	}
 }
