@@ -22,6 +22,7 @@ use Psr\Http\Message\RequestInterface;
 use Laminas\Diactoros\Request;
 use Laminas\Diactoros\Stream;
 use Laminas\Diactoros\Uri;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Клиент для Яндекс.Диска
@@ -499,22 +500,23 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	/**
 	 * Отправляет запрос.
 	 *
-	 * @param \Psr\Http\Message\RequestInterface $request
+	 * @param RequestInterface $request
 	 *
-	 * @return \Psr\Http\Message\ResponseInterface
+	 * @return ResponseInterface
+	 * @throws \JsonException
 	 */
-	public function send(RequestInterface $request)
+	public function send(RequestInterface $request): ResponseInterface
 	{
 		$response = parent::send($request);
 
-		if ($response->getStatusCode() == 202) {
+		if ($response->getStatusCode() === 202) {
 			if (($responseBody = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR)) && isset($responseBody['href'])) {
 				$operation = new Uri($responseBody['href']);
 
 				if (!$operation->getQuery()) {
 					$responseBody['operation'] = substr(strrchr($operation->getPath(), '/'), 1);
 					$stream = new Stream('php://temp', 'w');
-					$stream->write(json_encode($responseBody));
+					$stream->write(json_encode($responseBody, JSON_THROW_ON_ERROR));
 					$this->addOperation($responseBody['operation']);
 
 					return $response->withBody($stream);
