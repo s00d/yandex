@@ -65,7 +65,7 @@ class OAuth extends AbstractClient
 	 * @return $this
 	 * @throws \InvalidArgumentException
 	 */
-	public function setClientOauth($client_id)
+	public function setClientOauth($client_id):OAuth
 	{
 		if (!is_string($client_id)) {
 			throw new \InvalidArgumentException('ID приложения https://oauth.yandex.ru должен быть строкового типа.');
@@ -81,7 +81,7 @@ class OAuth extends AbstractClient
 	 *
 	 * @return string
 	 */
-	public function getClientOauth()
+	public function getClientOauth():string
 	{
 		return $this->clientOauth;
 	}
@@ -94,7 +94,7 @@ class OAuth extends AbstractClient
 	 * @return $this
 	 * @throws \InvalidArgumentException
 	 */
-	public function setClientOauthSecret($client_secret)
+	public function setClientOauthSecret($client_secret):OAuth
 	{
 		if (!is_string($client_secret)) {
 			throw new \InvalidArgumentException('Пароль приложения https://oauth.yandex.ru должен быть строкового типа.');
@@ -123,7 +123,7 @@ class OAuth extends AbstractClient
 	 * @return $this
 	 * @throws \InvalidArgumentException
 	 */
-	public function setAccessToken($token)
+	public function setAccessToken(string $token):OAuth
 	{
 		if (!is_string($token)) {
 			throw new \InvalidArgumentException('OAuth-токен должен быть строкового типа.');
@@ -139,7 +139,7 @@ class OAuth extends AbstractClient
 	 *
 	 * @return string
 	 */
-	public function getAccessToken()
+	public function getAccessToken():string
 	{
 		return (string) $this->token;
 	}
@@ -189,7 +189,7 @@ class OAuth extends AbstractClient
 			]));
 
 		try {
-			$response = json_decode($this->send($request)->wait()->getBody());
+			$response = json_decode($this->send($request)->getBody(), false, 512, JSON_THROW_ON_ERROR);
 
 			if ($onlyToken) {
 				return (string) $response->access_token;
@@ -199,7 +199,7 @@ class OAuth extends AbstractClient
 
 			return $response;
 		} catch (\Exception $exc) {
-			$response = json_decode($exc->getMessage());
+			$response = json_decode($exc->getMessage(), false, 512, JSON_THROW_ON_ERROR);
 
 			if (isset($response->error_description)) {
 				throw new UnauthorizedException($response->error_description);
@@ -218,7 +218,7 @@ class OAuth extends AbstractClient
 	 *
 	 * @return \Psr\Http\Message\RequestInterface
 	 */
-	protected function authentication(RequestInterface $request)
+	protected function authentication(RequestInterface $request): RequestInterface
 	{
 		if ($this->tokenRequired) {
 			return $request->withHeader('Authorization', sprintf('OAuth %s', $this->getAccessToken()));
@@ -236,7 +236,7 @@ class OAuth extends AbstractClient
 	 *
 	 * @return \Psr\Http\Message\ResponseInterface если статус код не является ошибочным, то вернуть объект ответа
 	 */
-	protected function transformResponseToException(RequestInterface $request, ResponseInterface $response)
+	protected function transformResponseToException(RequestInterface $request, ResponseInterface $response): ResponseInterface
 	{
 		if (isset($this->exceptions[$response->getStatusCode()])) {
 			$exception = $this->exceptions[$response->getStatusCode()];

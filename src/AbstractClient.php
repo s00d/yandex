@@ -125,6 +125,7 @@ abstract class AbstractClient
 	 * @param \Psr\Http\Message\RequestInterface $request
 	 *
 	 * @return \Psr\Http\Message\ResponseInterface
+	 * @throws \Http\Client\Exception
 	 */
 	public function send(RequestInterface $request):ResponseInterface
 	{
