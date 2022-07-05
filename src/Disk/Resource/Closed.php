@@ -88,7 +88,7 @@ class Closed extends AbstractResource
 			$response = $this->client->send(new Request($this->uri->withPath($this->uri->getPath() . 'resources')
 				->withQuery(http_build_query(array_merge($this->getParameters($this->parametersAllowed), [
 					'path' => $this->getPath()
-				]), null, '&')), 'GET'));
+				]), "", '&')), 'GET'));
 
 			if ($response->getStatusCode() == 200) {
 				$response = json_decode($response->getBody(), true);
@@ -125,7 +125,7 @@ class Closed extends AbstractResource
 	 *
 	 * @return mixed|null
 	 */
-	public function getProperty($index, $default = null)
+	public function getProperty(string $index, $default = null)
 	{
 		$properties = $this->get('custom_properties', []);
 
@@ -145,7 +145,7 @@ class Closed extends AbstractResource
 	 *
 	 * @return  array
 	 */
-	public function getProperties()
+	public function getProperties():array
 	{
 		return $this->get('custom_properties', []);
 	}
@@ -153,13 +153,14 @@ class Closed extends AbstractResource
 	/**
 	 * Добавление метаинформации для ресурса
 	 *
-	 * @param    mixed $meta  строка либо массив значений
-	 * @param    mixed $value NULL чтобы удалить определённую метаинформаию когда $meta строка
+	 * @param mixed $meta строка либо массив значений
+	 * @param mixed $value NULL чтобы удалить определённую метаинформаию когда $meta строка
 	 *
 	 * @return Closed
 	 * @throws \LengthException
+	 * @throws \JsonException
 	 */
-	public function set($meta, $value = null)
+	public function set($meta, $value = null): Closed
 	{
 		if (!is_array($meta)) {
 			if (!is_scalar($meta)) {
@@ -179,15 +180,15 @@ class Closed extends AbstractResource
 		}*/
 
 		$request = (new Request($this->uri->withPath($this->uri->getPath() . 'resources')
-			->withQuery(http_build_query(['path' => $this->getPath()], null, '&')), 'PATCH'));
+			->withQuery(http_build_query(['path' => $this->getPath()], "", '&')), 'PATCH'));
 
 		$request->getBody()
-			->write(json_encode(['custom_properties' => $meta]));
+			->write(json_encode(['custom_properties' => $meta], JSON_THROW_ON_ERROR));
 
 		$response = $this->client->send($request);
 
 		if ($response->getStatusCode() == 200) {
-			$this->setContents(json_decode($response->getBody(), true));
+			$this->setContents(json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR));
 			$this->store['docviewer'] = $this->createDocViewerUrl();
 		}
 
@@ -197,12 +198,13 @@ class Closed extends AbstractResource
 	/**
 	 * Разрешает обновление свойств объекта как массива
 	 *
-	 * @param    string $key
-	 * @param    mixed  $value
+	 * @param string $key
+	 * @param mixed $value
 	 *
 	 * @return  void
+	 * @throws \JsonException
 	 */
-	public function offsetSet($key, $value)
+	public function offsetSet($key, $value): void
 	{
 		$this->set($key, $value);
 	}
@@ -211,6 +213,7 @@ class Closed extends AbstractResource
 	 * Магический метод set. Добавляет метаинформацию
 	 *
 	 * @return void
+	 * @throws \JsonException
 	 */
 	public function __set($key, $value)
 	{
@@ -220,12 +223,13 @@ class Closed extends AbstractResource
 	/**
 	 * Разрешает использование unset() к метаинформации
 	 *
-	 * @param   string $key
+	 * @param string $key
 	 *
 	 * @return  void
 	 * @throws  \RuntimeException
+	 * @throws \JsonException
 	 */
-	public function offsetUnset($key)
+	public function offsetUnset($key): void
 	{
 		$this->set($key, null);
 	}
@@ -234,8 +238,9 @@ class Closed extends AbstractResource
 	 * Магический метод unset. Удаляет метаинформацию.
 	 *
 	 * @return void
+	 * @throws \JsonException
 	 */
-	public function __unset($key)
+	public function __unset($key): void
 	{
 		$this->set($key, null);
 	}
@@ -243,11 +248,11 @@ class Closed extends AbstractResource
 	/**
 	 * Удаление файла или папки
 	 *
-	 * @param   boolean $permanently TRUE Признак безвозвратного удаления
+	 * @param boolean $permanently TRUE Признак безвозвратного удаления
 	 *
 	 * @return  bool|\Arhitector\Yandex\Disk\Operation|\Arhitector\Yandex\Disk\Resource\Removed
 	 */
-	public function delete($permanently = false)
+	public function delete(bool $permanently = false)
 	{
 		$response = $this->client->send(new Request($this->uri->withPath($this->uri->getPath() . 'resources')
 			->withQuery(http_build_query([
@@ -299,13 +304,13 @@ class Closed extends AbstractResource
 	 * Приложения должны самостоятельно следить за статусами запрошенных операций.
 	 *
 	 * @param   string|\Arhitector\Yandex\Disk\Resource\Closed $destination новый путь.
-	 * @param   boolean                                        $overwrite   признак перезаписи файлов. Учитывается,
+	 * @param boolean $overwrite   признак перезаписи файлов. Учитывается,
 	 *                                                                      если ресурс перемещается в папку, в которой
 	 *                                                                      уже есть ресурс с таким именем.
 	 *
 	 * @return bool|\Arhitector\Yandex\Disk\Operation
 	 */
-	public function move($destination, $overwrite = false)
+	public function move($destination, bool $overwrite = false)
 	{
 		if ($destination instanceof Closed) {
 			$destination = $destination->getPath();
@@ -316,7 +321,7 @@ class Closed extends AbstractResource
 				'from'      => $this->getPath(),
 				'path'      => $destination,
 				'overwrite' => (bool) $overwrite
-			], null, '&')), 'POST'));
+			], "", '&')), 'POST'));
 
 		if ($response->getStatusCode() == 202 || $response->getStatusCode() == 201) {
 			$this->path = $destination;
@@ -342,13 +347,13 @@ class Closed extends AbstractResource
 	 * @return    \Arhitector\Yandex\Disk\Resource\Closed
 	 * @throws    mixed
 	 */
-	public function create()
+	public function create():Closed
 	{
 		try {
 			$this->client->send(new Request($this->uri->withPath($this->uri->getPath() . 'resources')
 				->withQuery(http_build_query([
 					'path' => $this->getPath()
-				], null, '&')), 'PUT'));
+				], "", '&')), 'PUT'));
 			$this->setContents([]);
 		} catch (\Exception $exc) {
 			throw $exc;
@@ -360,11 +365,11 @@ class Closed extends AbstractResource
 	/**
 	 * Публикация ресурса\Закрытие доступа
 	 *
-	 * @param   boolean $publish TRUE открыть доступ, FALSE закрыть доступ
+	 * @param boolean $publish TRUE открыть доступ, FALSE закрыть доступ
 	 *
 	 * @return  \Arhitector\Yandex\Disk\Resource\Closed|\Arhitector\Yandex\Disk\Resource\Opened
 	 */
-	public function setPublish($publish = true)
+	public function setPublish(bool $publish = true)
 	{
 		$request = 'resources/unpublish';
 
@@ -375,7 +380,7 @@ class Closed extends AbstractResource
 		$response = $this->client->send(new Request($this->uri->withPath($this->uri->getPath() . $request)
 			->withQuery(http_build_query([
 				'path' => $this->getPath()
-			], null, '&')), 'PUT'));
+			], "", '&')), 'PUT'));
 
 		if ($response->getStatusCode() == 200) {
 			$this->setContents([]);
@@ -436,7 +441,7 @@ class Closed extends AbstractResource
 		}
 
 		$response = $this->client->send(new Request($this->uri->withPath($this->uri->getPath() . 'resources/download')
-			->withQuery(http_build_query(['path' => $this->getPath()], null, '&')), 'GET'));
+			->withQuery(http_build_query(['path' => $this->getPath()], "", '&')), 'GET'));
 
 		if ($response->getStatusCode() == 200) {
 			$response = json_decode($response->getBody(), true);
@@ -473,11 +478,11 @@ class Closed extends AbstractResource
 	 * Копирование файла или папки
 	 *
 	 * @param   string|Closed $destination
-	 * @param   bool          $overwrite
+	 * @param bool $overwrite
 	 *
 	 * @return bool
 	 */
-	public function copy($destination, $overwrite = false)
+	public function copy($destination, bool $overwrite = false):bool
 	{
 		if ($destination instanceof Closed) {
 			$destination = $destination->getPath();
@@ -488,7 +493,7 @@ class Closed extends AbstractResource
 				'from'      => $this->getPath(),
 				'path'      => $destination,
 				'overwrite' => (bool) $overwrite
-			], null, '&')), 'POST'));
+			], "", '&')), 'POST'));
 
 		if ($response->getStatusCode() == 201) {
 			$response = json_decode($response->getBody(), true);
@@ -511,8 +516,8 @@ class Closed extends AbstractResource
 	 * Загрузить файл на диск
 	 *
 	 * @param   mixed  $file_path         может быть как путь к локальному файлу, так и URL к файлу.
-	 * @param   bool   $overwrite         если ресурс существует на Яндекс.Диске TRUE перезапишет ресурс.
-	 * @param   bool   $disable_redirects помогает запретить редиректы по адресу, TRUE запретит пере адресацию.
+	 * @param bool $overwrite         если ресурс существует на Яндекс.Диске TRUE перезапишет ресурс.
+	 * @param bool $disable_redirects помогает запретить редиректы по адресу, TRUE запретит пере адресацию.
 	 *
 	 * @return  bool|\Arhitector\Yandex\Disk\Operation
 	 *
@@ -520,7 +525,7 @@ class Closed extends AbstractResource
 	 *
 	 * @TODO    Добавить, если передана папка - сжать папку в архив и загрузить.
 	 */
-	public function upload($file_path, $overwrite = false, $disable_redirects = false)
+	public function upload($file_path, bool $overwrite = false, bool $disable_redirects = false)
 	{
 		if (is_string($file_path)) {
 			$scheme = substr($file_path, 0, 7);
@@ -532,7 +537,7 @@ class Closed extends AbstractResource
 							'url'  => $file_path,
 							'path' => $this->getPath(),
 							'disable_redirects' => (int) $disable_redirects
-						], null, '&')), 'POST'));
+						], "", '&')), 'POST'));
 				} catch (AlreadyExistsException $exc) {
 					// параметр $overwrite не работает т.к. диск не поддерживает {AlreadyExistsException:409}->rename->delete
 					throw new AlreadyExistsException(
@@ -568,10 +573,10 @@ class Closed extends AbstractResource
 
 		$access_upload = json_decode($this->client->send(new Request($this->uri->withPath($this->uri->getPath() . 'resources/upload')
 			->withQuery(http_build_query([
-				'path'      => $this->getPath(),
-				'overwrite' => (int) ((bool) $overwrite),
-			], null, '&')), 'GET'))
-			->getBody(), true);
+				'path' => $this->getPath(),
+				'overwrite' => (int)((bool)$overwrite),
+			], "", '&')), 'GET'))
+			->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
 		if (!isset($access_upload['href'])) {
 			// $this->client->setRetries = 1
@@ -602,7 +607,7 @@ class Closed extends AbstractResource
 	 *
 	 * @TODO    Не работает для файлов вложенных в публичную папку.
 	 */
-	public function getLink()
+	public function getLink():string
 	{
 		if (!$this->has()) {
 			throw new NotFoundException('Не удалось найти запрошенный ресурс.');
@@ -611,7 +616,7 @@ class Closed extends AbstractResource
 		$response = $this->client->send(new Request($this->uri->withPath($this->uri->getPath() . 'resources/download')
 			->withQuery(http_build_query([
 				'path'       => (string) $this->getPath()
-			], null, '&')), 'GET'));
+			], "", '&')), 'GET'));
 
 		if ($response->getStatusCode() == 200) {
 			$response = json_decode($response->getBody(), true);
@@ -644,7 +649,7 @@ class Closed extends AbstractResource
 			$docviewer['url'] = "ya-disk:///disk/{$docviewer['url']}";
 
 			return (string) (new Uri('https://docviewer.yandex.ru'))
-				->withQuery(http_build_query($docviewer, null, '&'));
+				->withQuery(http_build_query($docviewer, "", '&'));
 		}
 
 		return false;

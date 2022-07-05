@@ -30,7 +30,7 @@ trait ContainerTrait
 	 *
 	 * @return    integer    размер контейнера
 	 */
-	public function count()
+	public function count(): int
 	{
 		return count($this->toArray());
 	}
@@ -77,9 +77,9 @@ trait ContainerTrait
 	/**
 	 * IteratorAggregate
 	 *
-	 * @return \IteratorAggregate    итератор
+	 * @return \ArrayIterator    итератор
 	 */
-	public function getIterator()
+	public function getIterator():\ArrayIterator
 	{
 		return new \ArrayIterator($this->toArray());
 	}
@@ -158,7 +158,7 @@ trait ContainerTrait
 	 *
 	 * @return    bool
 	 */
-	public function offsetExists($key)
+	public function offsetExists($key): bool
 	{
 		return $this->has($key);
 	}
@@ -171,7 +171,7 @@ trait ContainerTrait
 	 * @return    mixed
 	 * @throws    \OutOfBoundsException
 	 */
-	public function offsetGet($key)
+	public function offsetGet($key): bool
 	{
 		return $this->get($key, function() use ($key) {
 			throw new \OutOfBoundsException('Индекс не существует '.$key);
@@ -186,9 +186,9 @@ trait ContainerTrait
 	 * @return  null
 	 * @throws  \RuntimeException
 	 */
-	public function offsetUnset($key)
+	public function offsetUnset($key): void
 	{
-		return null;
+		return;
 	}
 
 	/**
@@ -199,9 +199,9 @@ trait ContainerTrait
 	 *
 	 * @return  null
 	 */
-	public function offsetSet($key, $value)
+	public function offsetSet($key, $value): void
 	{
-		return null;
+		return;
 	}
 
 	/**

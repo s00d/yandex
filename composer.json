@@ -13,9 +13,9 @@
 		"php": ">=7.3|^8.1",
 		"laminas/laminas-diactoros": "^2.5",
 		"league/event": "^2.2",
-		"php-http/curl-client": "1.4.*",
-		"php-http/message": "^1.2",
-		"php-http/client-common": "^1.1",
+		"php-http/curl-client": "^2.2.1",
+		"php-http/message": "^1.13.0",
+		"php-http/client-common": "^2.5.0",
 		"ext-curl": "*",
 		"ext-json": "*"
 	},

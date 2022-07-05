@@ -152,7 +152,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	/**
 	 * Получает информацию о диске
 	 *
-	 * @param array $allowed
+	 * @param array|null $allowed
 	 *
 	 * @return array
 	 * @throws \JsonException
@@ -191,9 +191,9 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	/**
 	 * Работа с ресурсами на диске
 	 *
-	 * @param    string  $path Путь к новому либо уже существующему ресурсу
-	 * @param    integer $limit
-	 * @param    integer $offset
+	 * @param string $path Путь к новому либо уже существующему ресурсу
+	 * @param integer $limit
+	 * @param integer $offset
 	 *
 	 * @return   \Arhitector\Yandex\Disk\Resource\Closed
 	 *
@@ -216,7 +216,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 * 'mime_type' => string 'audio/mpeg' (length=10)
 	 * 'size' => int 8099883
 	 */
-	public function getResource($path, $limit = 20, $offset = 0)
+	public function getResource(string $path, int $limit = 20, int $offset = 0):Disk\Resource\Closed
 	{
 		if (!is_string($path)) {
 			throw new \InvalidArgumentException('Ресурс, должен быть строкового типа - путь к файлу/папке.');
@@ -247,11 +247,11 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 * 0 => object(Arhitector\Yandex\Disk\Resource\Closed)[30]
 	 * .....
 	 */
-	public function getResources($limit = 20, $offset = 0)
+	public function getResources(int $limit = 20, int $offset = 0):Disk\Resource\Collection
 	{
 		return (new Disk\Resource\Collection(function ($parameters) {
 			$response = $this->send((new Request($this->uri->withPath($this->uri->getPath() . 'resources/files')
-				->withQuery(http_build_query($parameters, null, '&')), 'GET')));
+				->withQuery(http_build_query($parameters, "", '&')), 'GET')));
 
 			if ($response->getStatusCode() == 200) {
 				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
@@ -292,7 +292,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 * 'mime_type' => string 'audio/mpeg' (length=10)
 	 * 'size' => int 8099883
 	 */
-	public function getPublishResource($public_key, $limit = 20, $offset = 0)
+	public function getPublishResource($public_key, $limit = 20, $offset = 0):Disk\Resource\Opened
 	{
 		if (!is_string($public_key)) {
 			throw new \InvalidArgumentException('Публичный ключ ресурса должен быть строкового типа.');
@@ -310,12 +310,12 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *
 	 * @return \Arhitector\Yandex\Disk\Resource\Collection
 	 */
-	public function getPublishResources($limit = 20, $offset = 0)
+	public function getPublishResources(int $limit = 20, int $offset = 0):Disk\Resource\Collection
 	{
 		return (new Disk\Resource\Collection(function ($parameters) {
 			$previous = $this->setAccessTokenRequired(false);
 			$response = $this->send((new Request($this->uri->withPath($this->uri->getPath() . 'resources/public')
-				->withQuery(http_build_query($parameters, null, '&')), 'GET')));
+				->withQuery(http_build_query($parameters, "", '&')), 'GET')));
 			$this->setAccessTokenRequired($previous);
 
 			if ($response->getStatusCode() == 200) {
@@ -336,9 +336,9 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	/**
 	 * Ресурсы в корзине.
 	 *
-	 * @param    string $path путь к файлу в корзине
-	 * @param int       $limit
-	 * @param int       $offset
+	 * @param string $path путь к файлу в корзине
+	 * @param int $limit
+	 * @param int $offset
 	 *
 	 * @return \Arhitector\Yandex\Disk\Resource\Removed
 	 * @example
@@ -346,7 +346,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 * $disk->getTrashResource('file.ext') -> toArray() // файл в корзине
 	 * $disk->getTrashResource('trash:/file.ext') -> delete()
 	 */
-	public function getTrashResource($path, $limit = 20, $offset = 0)
+	public function getTrashResource(string $path, int $limit = 20, int $offset = 0)
 	{
 		if (!is_string($path)) {
 			throw new \InvalidArgumentException('Ресурс, должен быть строкового типа - путь к файлу/папке, либо NULL');
@@ -379,7 +379,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 			}
 
 			$response = $this->send((new Request($this->uri->withPath($this->uri->getPath() . 'trash/resources')
-				->withQuery(http_build_query($parameters + ['path' => 'trash:/'], null, '&')), 'GET')));
+				->withQuery(http_build_query($parameters + ['path' => 'trash:/'], "", '&')), 'GET')));
 
 			if ($response->getStatusCode() == 200) {
 				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
@@ -401,6 +401,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 * Очистить корзину.
 	 *
 	 * @return bool|\Arhitector\Yandex\Disk\Operation
+	 * @throws \JsonException
 	 */
 	public function cleanTrash()
 	{
@@ -422,8 +423,8 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	/**
 	 * Последние загруженные файлы
 	 *
-	 * @param    integer $limit
-	 * @param    integer $offset
+	 * @param integer $limit
+	 * @param integer $offset
 	 *
 	 * @return   \Arhitector\Yandex\Disk\Resource\Collection
 	 *
@@ -431,11 +432,11 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *
 	 * $disk->uploaded(limit, offset) // коллекия закрытых ресурсов
 	 */
-	public function uploaded($limit = 20, $offset = 0)
+	public function uploaded(int $limit = 20, int $offset = 0):Disk\Resource\Collection
 	{
 		return (new Disk\Resource\Collection(function ($parameters) {
 			$response = $this->send((new Request($this->uri->withPath($this->uri->getPath() . 'resources/last-uploaded')
-				->withQuery(http_build_query($parameters, null, '&')), 'GET')));
+				->withQuery(http_build_query($parameters, "", '&')), 'GET')));
 
 			if ($response->getStatusCode() == 200) {
 				$response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
@@ -455,7 +456,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	/**
 	 * Получить статус операции.
 	 *
-	 * @param   string $identifier идентификатор операции или NULL
+	 * @param string $identifier идентификатор операции или NULL
 	 *
 	 * @return  \Arhitector\Yandex\Disk\Operation
 	 *
@@ -463,7 +464,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *
 	 * $disk->getOperation('identifier operation')
 	 */
-	public function getOperation($identifier)
+	public function getOperation(string $identifier):Disk\Operation
 	{
 		return new Disk\Operation($identifier, $this, $this->getUri());
 	}
@@ -473,9 +474,9 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *
 	 * @return int
 	 */
-	public function count()
+	public function count(): int
 	{
-		return sizeof($this->getOperations());
+		return count($this->getOperations());
 	}
 
 	/**
@@ -492,7 +493,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *  1 => 'identifier_2',
 	 *  2 => 'identifier_3',
 	 */
-	public function getOperations()
+	public function getOperations():array
 	{
 		return $this->operations;
 	}
@@ -532,7 +533,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *
 	 * @return boolean
 	 */
-	public function isWrapper()
+	public function isWrapper():bool
 	{
 		//return in_array(\Mackey\Yandex\Disk\Stream\Wrapper::SCHEME, stream_get_wrappers());
 		return false;
@@ -545,7 +546,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *
 	 * @return \Arhitector\Yandex\Disk
 	 */
-	protected function addOperation($identifier)
+	protected function addOperation($identifier):Disk
 	{
 		$this->operations[] = $identifier;
 
