@@ -5,6 +5,10 @@
 
 ## Список изменений
 
+5/7/2022
+
+- Обновлены зависимости и поправлен код
+
 21/12/2020
 
 - Начиная с 2.1 минимальная версия php 7.3
@@ -18,7 +22,7 @@
 
 ## Требования
 
-- PHP >= 5.6
+- PHP >= 7.3
 - Расширение php_curl
 
 ## Внести свой вклад в развитие
@@ -30,13 +34,13 @@
 Поддерживается установка с помощью [менеджера пакетов](https://getcomposer.org).
 
 ```
-$ composer require arhitector/yandex dev-master
+$ composer require s00d/yandex dev-master
 ```
 
 Или 
 
 ```
-$ php composer.phar require arhitector/yandex dev-master
+$ php composer.phar require s00d/yandex dev-master
 ```
 
 ## Тесты
