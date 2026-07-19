@@ -1,0 +1,53 @@
+tests/DiskTest.php
+  s_7c157e470dfb8d::t_2250df746d45eb 1-15,17-37,46-47
+  s_7c157e470dfb8d::t_73e5ae798e53f2 16,38-45
+src/Client/Exception/NotFoundException.php
+  s_7c157e470dfb8d::t_5dab45d3274390 32
+phpunit.xml
+  s_7c157e470dfb8d::t_55ba17ba8179d1 1-13
+composer.json
+  s_7c157e470dfb8d::t_ca275b50ca5c97 18
+  s_7c157e470dfb8d::t_93853ab30c7f90 13-14,24,37,41,43-46
+src/Client/HttpClient.php
+  s_7c157e470dfb8d::t_7cd5f22dd9b72a 97-98
+src/Client/Exception/UnauthorizedException.php
+  s_7c157e470dfb8d::t_4cd13f156e415e 31
+src/Disk/Resource/Collection.php
+  s_7c157e470dfb8d::t_177d4706925cf6 42
+  s_7c157e470dfb8d::t_f965d1454dc6e9 53
+README.md
+  s_7c157e470dfb8d::t_8b0d6af746b379 33
+  s_7c157e470dfb8d::t_2ba3e7618ff330 8-15
+.gitignore
+  s_7c157e470dfb8d::t_08b1173b0004f8 47-50
+src/AbstractClient.php
+  s_7c157e470dfb8d::t_68c5b7054adfc4 87
+src/Client/Container/ContainerTrait.php
+  s_7c157e470dfb8d::t_b3a91a9f994b16 45,72
+src/Disk.php
+  s_7c157e470dfb8d::t_095d6a46b61820 170
+src/Disk/FilterTrait.php
+  s_7c157e470dfb8d::t_7aeb7e5e4200c6 118
+src/Disk/Resource/Closed.php
+  s_7c157e470dfb8d::t_815fd5ffd28f64 85
+src/Disk/Resource/Opened.php
+  s_7c157e470dfb8d::t_274d2da6a7f740 95,266
+src/Disk/Resource/Removed.php
+  s_7c157e470dfb8d::t_e05907811d0f3e 76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "b3734e30d17e352142c737cf129e50de986ed22e",
+  "prompts": {},
+  "sessions": {
+    "s_7c157e470dfb8d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "54466542-dfe1-43d2-97ce-dd4383e46e6e",
+        "model": "default"
+      },
+      "human_author": "Pavel Kuzmin <Virus191288@gmail.com>"
+    }
+  }
+}
