@@ -29,7 +29,7 @@ class NotFoundException extends \RuntimeException implements Exception
 	 * @param   string     $message  Сообщение исключения
 	 * @param   \Exception $previous Предыдущее исключение
 	 */
-	public function __construct($message, $code = null, \Exception $previous = null)
+	public function __construct($message, $code = null, ?\Exception $previous = null)
 	{
 		parent::__construct($message, 404, $previous);
 	}

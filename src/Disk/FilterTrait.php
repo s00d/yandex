@@ -115,7 +115,7 @@ trait FilterTrait
 	 *
 	 * @return array
 	 */
-	public function getParameters(array $allowed = null):array
+	public function getParameters(?array $allowed = null):array
 	{
 		if ($allowed !== null)
 		{

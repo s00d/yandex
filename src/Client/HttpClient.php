@@ -94,10 +94,8 @@ class HttpClient implements HttpClientInterface, HttpAsyncClientInterface
 	 */
 	public function __destruct()
 	{
-		if (is_resource($this->handle))
-		{
-			curl_close($this->handle);
-		}
+		// curl_close() is a no-op since PHP 8.0 and deprecated in 8.5; drop the handle instead.
+		$this->handle = null;
 	}
 
 	/**

@@ -84,7 +84,7 @@ abstract class AbstractClient
 	{
 		$this->uri = new Uri(static::API_BASEPATH);
 		$this->client = new PluginClient(new HttpClient(new DiactorosMessageFactory, new Factory, [
-			CURLOPT_SSL_VERIFYPEER => false
+			CURLOPT_SSL_VERIFYPEER => true
 		]), [
 			new RedirectPlugin
 		]);

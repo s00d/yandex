@@ -82,7 +82,7 @@ class Closed extends AbstractResource
 	 *
 	 * @TODO    добавить clearModify(), тем самым сделать возможность получать списки ресурсов во вложенных папках.
 	 */
-	public function toArray(array $allowed = null)
+	public function toArray(?array $allowed = null)
 	{
 		if (!$this->_toArray() || $this->isModified()) {
 			$response = $this->client->send(new Request($this->uri->withPath($this->uri->getPath() . 'resources')

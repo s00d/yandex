@@ -39,7 +39,7 @@ class Collection extends CollectionContainer
 	/**
 	 *	Конструктор
 	 */
-	public function __construct(\Closure $data_closure = null)
+	public function __construct(?\Closure $data_closure = null)
 	{
 		$this->closure = $data_closure;
 		parent::__construct();
@@ -50,7 +50,7 @@ class Collection extends CollectionContainer
 	 *
 	 *	@return	array
 	 */
-	public function toArray(array $allowed = null):array
+	public function toArray(?array $allowed = null):array
 	{
 		if ( ! parent::toArray() || $this->isModified())
 		{

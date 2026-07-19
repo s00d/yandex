@@ -5,6 +5,14 @@
 
 ## Список изменений
 
+19/07/2026 — **2.5.0**
+
+- PHP `^8.1`, `laminas/laminas-diactoros` `^3`
+- Explicit nullable types (PHP 8.4+/8.5)
+- Curl handle cleanup without deprecated `curl_close()`
+- SSL peer verification enabled by default
+- Offline PHPUnit smoke tests
+
 5/7/2022
 
 - Обновлены зависимости и поправлен код
@@ -22,7 +30,7 @@
 
 ## Требования
 
-- PHP >= 7.3
+- PHP ^8.1
 - Расширение php_curl
 
 ## Внести свой вклад в развитие

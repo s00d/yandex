@@ -44,3 +44,7 @@ Temporary Items
 
 vendor
 composer.lock
+
+.idea
+.phpunit.result.cache
+.phpunit.cache

@@ -73,7 +73,7 @@ class Removed extends AbstractResource
 	 * @return    mixed
 	 * @throws \JsonException
 	 */
-	public function toArray(array $allowed = null)
+	public function toArray(?array $allowed = null)
 	{
 		if (!$this->_toArray() || $this->isModified()) {
 			$response = $this->client->send((new Request($this->uri->withPath($this->uri->getPath() . 'trash/resources')

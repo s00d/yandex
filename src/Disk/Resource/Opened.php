@@ -92,7 +92,7 @@ class Opened extends AbstractResource
 	 * @return    mixed
 	 * @throws \JsonException
 	 */
-	public function toArray(array $allowed = null)
+	public function toArray(?array $allowed = null)
 	{
 		if (!$this->_toArray() || $this->isModified()) {
 			$response = $this->client->send((new Request($this->uri->withPath($this->uri->getPath() . 'public/resources')
@@ -263,7 +263,7 @@ class Opened extends AbstractResource
 	 * @return    mixed
 	 * @throws \JsonException
 	 */
-	public function save(string $name = null, string $path = null)
+	public function save(?string $name = null, ?string $path = null)
 	{
 		$parameters = [];
 

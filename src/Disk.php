@@ -167,7 +167,7 @@ class Disk extends OAuth implements \ArrayAccess, \IteratorAggregate, \Countable
 	 *      'applications' => string 'disk:/Приложения' (length=26)
 	 *      'downloads' => string 'disk:/Загрузки/' (length=23)
 	 */
-	public function toArray(array $allowed = null)
+	public function toArray(?array $allowed = null)
 	{
 		if (!$this->_toArray()) {
 			$response = $this->send(new Request($this->uri, 'GET'));

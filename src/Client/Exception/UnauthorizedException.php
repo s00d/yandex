@@ -28,7 +28,7 @@ class UnauthorizedException extends \RuntimeException implements Exception
 	 * @param int $code Код исключения
 	 * @param \Exception|null $previous Предыдущее исключение
 	 */
-	public function __construct($message, $code = 401, \Exception $previous = null)
+	public function __construct($message, $code = 401, ?\Exception $previous = null)
 	{
 		parent::__construct($message, $code, $previous);
 	}

@@ -42,7 +42,7 @@ trait ContainerTrait
 	 *
 	 * @return  array  контейнер
 	 */
-	public function toArray(array $allowed = null)
+	public function toArray(?array $allowed = null)
 	{
 		$contents = $this->store;
 
@@ -69,7 +69,7 @@ trait ContainerTrait
 	 *
 	 * @return  \stdClass  контейнер
 	 */
-	public function toObject(array $allowed = null)
+	public function toObject(?array $allowed = null)
 	{
 		return (object) $this->toArray($allowed);
 	}
