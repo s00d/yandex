@@ -13,7 +13,7 @@
 
 namespace Arhitector\Yandex\Client\Stream;
 
-use League\Event\EmitterTrait;
+use Arhitector\Yandex\Client\Event\EmitterTrait;
 use Psr\Http\Message\StreamInterface;
 use Laminas\Diactoros\Stream;
 

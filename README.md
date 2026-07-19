@@ -5,6 +5,10 @@
 
 ## Список изменений
 
+19/07/2026 — **2.5.1**
+
+- Remove `league/event` (conflicts with Passport / `league/event` ^3); use internal emitter
+
 19/07/2026 — **2.5.0**
 
 - PHP `^8.1`, `laminas/laminas-diactoros` `^3`

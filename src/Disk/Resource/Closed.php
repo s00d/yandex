@@ -19,7 +19,6 @@ use Arhitector\Yandex\Client\Stream\Progress;
 use Arhitector\Yandex\Disk;
 use Arhitector\Yandex\Disk\AbstractResource;
 use Arhitector\Yandex\Disk\Exception\AlreadyExistsException;
-use League\Event\Event;
 use Psr\Http\Message\StreamInterface;
 use Laminas\Diactoros\Request;
 use Laminas\Diactoros\Stream;
@@ -585,7 +584,7 @@ class Closed extends AbstractResource
 
 		if ($this->getEmitter()->hasListeners('progress')) {
 			$stream = new Progress($file_path, 'rb');
-			$stream->addListener('progress', function (Event $event, $percent) {
+			$stream->addListener('progress', function ($percent) {
 				$this->emit('progress', $percent);
 			});
 		} else {

@@ -13,7 +13,7 @@
 namespace Arhitector\Yandex\Disk;
 
 use Arhitector\Yandex\Client\Container\ContainerTrait;
-use League\Event\EmitterTrait;
+use Arhitector\Yandex\Client\Event\EmitterTrait;
 
 /**
  * Базовый касс, описывающий ресурс.
