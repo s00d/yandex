@@ -13,7 +13,7 @@
 
 namespace Arhitector\Yandex\Client\Stream;
 
-use Http\Message\StreamFactory;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Laminas\Diactoros\Stream;
 
@@ -22,36 +22,32 @@ use Laminas\Diactoros\Stream;
  *
  * @package Arhitector\Yandex\Client\Stream
  */
-class Factory implements StreamFactory
+class Factory implements StreamFactoryInterface
 {
-
 	/**
 	 * Create a new stream instance.
 	 *
-	 * @param StreamInterface $body
-	 *
-	 * @return null|Stream
-	 * @throws \RuntimeException
-	 * @throws \InvalidArgumentException
+	 * @param string $content
 	 */
-	public function createStream($body = null)
+	public function createStream(string $content = ''): StreamInterface
 	{
-		if (!$body instanceof StreamInterface) {
-			if (is_resource($body)) {
-				$body = new Stream($body);
-			} else {
-				$stream = new Stream('php://temp', 'rb+');
+		$stream = new Stream('php://temp', 'rb+');
 
-				if (null !== $body) {
-					$stream->write((string) $body);
-				}
-
-				$body = $stream;
-			}
+		if ($content !== '') {
+			$stream->write($content);
+			$stream->rewind();
 		}
 
-		$body->rewind();
+		return $stream;
+	}
 
-		return $body;
+	public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
+	{
+		return new Stream($filename, $mode);
+	}
+
+	public function createStreamFromResource($resource): StreamInterface
+	{
+		return new Stream($resource);
 	}
 }
